@@ -1,11 +1,11 @@
 import { getReasonPhrase, StatusCodes } from 'http-status-codes'
 import { describe, test, expect, vi, beforeEach, afterEach } from 'vitest'
 
-import { VerifyError } from './core/errors'
-import type { Outcome } from './core/models'
-import { server } from './server'
+import { factory } from './factory'
+import { VerifyError } from '../core/errors'
+import type { Outcome } from '../core/models'
 
-describe('server.ts', () => {
+describe('factory.ts', () => {
   beforeEach(() => {
     vi.stubGlobal('fetch', vi.fn())
   })
@@ -24,7 +24,7 @@ describe('server.ts', () => {
           headers: { 'Content-Type': 'application/json' },
         }),
       )
-      const http = server({ base: 'https://api.example.com' })
+      const http = factory({ base: 'https://api.example.com' })
 
       const response = await http.get<typeof data>('/users/1')
 
@@ -50,7 +50,7 @@ describe('server.ts', () => {
           data,
         }),
       )
-      const http = server()
+      const http = factory()
 
       const response = await http.get<typeof data>(action)
 
@@ -70,7 +70,7 @@ describe('server.ts', () => {
           headers: { 'Content-Type': 'application/json' },
         }),
       )
-      const http = server({ base: 'https://api.example.com' })
+      const http = factory({ base: 'https://api.example.com' })
 
       const response = await http.get('/users/999')
 
@@ -91,7 +91,7 @@ describe('server.ts', () => {
           },
         ),
       )
-      const http = server({ base: 'https://api.example.com' })
+      const http = factory({ base: 'https://api.example.com' })
 
       const response = await http.get('/users/1')
 
@@ -106,7 +106,7 @@ describe('server.ts', () => {
       const action = vi.fn(async () => {
         throw new Error('The get operation was aborted')
       })
-      const http = server()
+      const http = factory()
 
       const response = await http.get(action)
 
@@ -126,7 +126,7 @@ describe('server.ts', () => {
           data,
         }),
       )
-      const http = server()
+      const http = factory()
 
       const response = await http.get<typeof data>(action, {
         verify: (response) => 'id' in response && 'name' in response,
@@ -147,7 +147,7 @@ describe('server.ts', () => {
           data: { wrong: 'data' } as unknown as { id: number },
         }),
       )
-      const http = server()
+      const http = factory()
 
       const response = await http.get<{ id: number }>(action, {
         verify: (data) => 'id' in data,
@@ -171,7 +171,7 @@ describe('server.ts', () => {
           headers: { 'Content-Type': 'application/json' },
         }),
       )
-      const http = server({ base: 'https://api.example.com' })
+      const http = factory({ base: 'https://api.example.com' })
 
       const response = await http.post<typeof data>('/users', body)
 
@@ -198,7 +198,7 @@ describe('server.ts', () => {
           data,
         }),
       )
-      const http = server()
+      const http = factory()
 
       const response = await http.post<typeof data>(action)
 
@@ -218,7 +218,7 @@ describe('server.ts', () => {
           headers: { 'Content-Type': 'application/json' },
         }),
       )
-      const http = server({ base: 'https://api.example.com' })
+      const http = factory({ base: 'https://api.example.com' })
 
       const response = await http.post('/users', { name: 'post-4xx' })
 
@@ -239,7 +239,7 @@ describe('server.ts', () => {
           },
         ),
       )
-      const http = server({ base: 'https://api.example.com' })
+      const http = factory({ base: 'https://api.example.com' })
 
       const response = await http.post('/users', { name: 'post-5xx' })
 
@@ -254,7 +254,7 @@ describe('server.ts', () => {
       const action = vi.fn(async () => {
         throw new Error('The post operation was aborted')
       })
-      const http = server()
+      const http = factory()
 
       const response = await http.post(action)
 
@@ -276,7 +276,7 @@ describe('server.ts', () => {
           headers: { 'Content-Type': 'application/json' },
         }),
       )
-      const http = server({ base: 'https://api.example.com' })
+      const http = factory({ base: 'https://api.example.com' })
 
       const response = await http.put<typeof data>('/users/1', body)
 
@@ -303,7 +303,7 @@ describe('server.ts', () => {
           data,
         }),
       )
-      const http = server()
+      const http = factory()
 
       const response = await http.put<typeof data>(action)
 
@@ -322,7 +322,7 @@ describe('server.ts', () => {
           headers: { 'Content-Type': 'application/json' },
         }),
       )
-      const http = server({ base: 'https://api.example.com' })
+      const http = factory({ base: 'https://api.example.com' })
 
       const response = await http.put('/users/999', { name: 'put-4xx' })
 
@@ -343,7 +343,7 @@ describe('server.ts', () => {
           },
         ),
       )
-      const http = server({ base: 'https://api.example.com' })
+      const http = factory({ base: 'https://api.example.com' })
 
       const response = await http.put('/users/1', { name: 'put-5xx' })
 
@@ -358,7 +358,7 @@ describe('server.ts', () => {
       const action = vi.fn(async () => {
         throw new Error('The put operation was aborted')
       })
-      const http = server()
+      const http = factory()
 
       const response = await http.put(action)
 
@@ -380,7 +380,7 @@ describe('server.ts', () => {
           headers: { 'Content-Type': 'application/json' },
         }),
       )
-      const http = server({ base: 'https://api.example.com' })
+      const http = factory({ base: 'https://api.example.com' })
 
       const response = await http.patch<typeof data>('/users/1', body)
 
@@ -407,7 +407,7 @@ describe('server.ts', () => {
           data,
         }),
       )
-      const http = server()
+      const http = factory()
 
       const response = await http.patch<typeof data>(action)
 
@@ -426,7 +426,7 @@ describe('server.ts', () => {
           headers: { 'Content-Type': 'application/json' },
         }),
       )
-      const http = server({ base: 'https://api.example.com' })
+      const http = factory({ base: 'https://api.example.com' })
 
       const response = await http.patch('/users/1', { name: 'patch-4xx' })
 
@@ -447,7 +447,7 @@ describe('server.ts', () => {
           },
         ),
       )
-      const http = server({ base: 'https://api.example.com' })
+      const http = factory({ base: 'https://api.example.com' })
 
       const response = await http.patch('/users/1', { name: 'patch-5xx' })
 
@@ -462,7 +462,7 @@ describe('server.ts', () => {
       const action = vi.fn(async () => {
         throw new Error('The patch operation was aborted')
       })
-      const http = server()
+      const http = factory()
 
       const response = await http.patch(action)
 
@@ -481,7 +481,7 @@ describe('server.ts', () => {
           status: StatusCodes.NO_CONTENT,
         }),
       )
-      const http = server({ base: 'https://api.example.com' })
+      const http = factory({ base: 'https://api.example.com' })
 
       const response = await http.delete('/users/1')
 
@@ -506,7 +506,7 @@ describe('server.ts', () => {
           data: undefined,
         }),
       )
-      const http = server()
+      const http = factory()
 
       const response = await http.delete(action)
 
@@ -525,7 +525,7 @@ describe('server.ts', () => {
           headers: { 'Content-Type': 'application/json' },
         }),
       )
-      const http = server({ base: 'https://api.example.com' })
+      const http = factory({ base: 'https://api.example.com' })
 
       const response = await http.delete('/users/999')
 
@@ -546,7 +546,7 @@ describe('server.ts', () => {
           },
         ),
       )
-      const http = server({ base: 'https://api.example.com' })
+      const http = factory({ base: 'https://api.example.com' })
 
       const response = await http.delete('/users/1')
 
@@ -561,7 +561,7 @@ describe('server.ts', () => {
       const action = vi.fn(async () => {
         throw new Error('The delete operation was aborted')
       })
-      const http = server()
+      const http = factory()
 
       const response = await http.delete(action)
 

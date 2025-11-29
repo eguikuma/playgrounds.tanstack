@@ -1,18 +1,18 @@
 import { StatusCodes } from 'http-status-codes'
 import { describe, test, expect, vi, beforeEach } from 'vitest'
 
-import { server } from './server'
-import type { Outcome } from '../http'
+import { factory } from './factory'
+import type { Outcome } from '../../http/core/models'
 
 const mock = {
   get: vi.fn(),
 }
 
-vi.mock('../http/server', () => ({
-  server: () => mock,
+vi.mock('../../http/vanilla/factory', () => ({
+  factory: () => mock,
 }))
 
-describe('server.ts', () => {
+describe('factory.ts', () => {
   beforeEach(() => {
     vi.clearAllMocks()
   })
@@ -41,7 +41,7 @@ describe('server.ts', () => {
           </rss>
         `,
       })
-      const rss = server()
+      const rss = factory()
 
       const response = await rss.get('https://example.com/feed.xml')
 
@@ -72,7 +72,7 @@ describe('server.ts', () => {
           `,
         }),
       )
-      const rss = server()
+      const rss = factory()
 
       const response = await rss.get(action)
 
@@ -92,7 +92,7 @@ describe('server.ts', () => {
         status: StatusCodes.OK,
         data: 'invalid xml content',
       })
-      const rss = server()
+      const rss = factory()
 
       const response = await rss.get('https://example.com/invalid.xml')
 

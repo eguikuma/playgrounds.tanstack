@@ -7,24 +7,24 @@ import { describe, test, expect, beforeEach, afterEach, vi } from 'vitest'
 
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 
-import type { Feed, Entry, PagedFeed } from './core/models'
-import { react } from './react.client'
-import type { Outcome } from '../http'
+import { factory } from './react.factory'
+import type { Outcome } from '../../http/core/models'
+import type { Feed, Entry, PagedFeed } from '../core/models'
 
-describe('react.client.ts', () => {
-  let client: QueryClient
+describe('react.factory.ts', () => {
+  let tanstack: QueryClient
   let wrapper: ({ children }: { children: ReactNode }) => ReactNode
 
   beforeEach(() => {
     vi.stubGlobal('fetch', vi.fn())
 
-    client = new QueryClient({
+    tanstack = new QueryClient({
       defaultOptions: {
         queries: { retry: false },
       },
     })
     wrapper = ({ children }: { children: ReactNode }) =>
-      createElement(QueryClientProvider, { client }, children)
+      createElement(QueryClientProvider, { client: tanstack }, children)
   })
 
   afterEach(() => {
@@ -51,7 +51,7 @@ describe('react.client.ts', () => {
           },
         ),
       )
-      const rss = react()
+      const rss = factory()
 
       const { result } = renderHook(() => rss.get('/api/feed.xml', { key: ['rss-get-string'] }), {
         wrapper,
@@ -64,7 +64,7 @@ describe('react.client.ts', () => {
     })
 
     test('サーバーアクションを指定して、成功結果を取得すること', async () => {
-      const rss = react()
+      const rss = factory()
       const action = async (): Promise<Outcome<string>> => ({
         success: true,
         status: StatusCodes.OK,
@@ -89,7 +89,7 @@ describe('react.client.ts', () => {
     })
 
     test('4xxの場合、失敗結果を返すこと', async () => {
-      const rss = react()
+      const rss = factory()
       const action = async (): Promise<Outcome<string>> => ({
         success: false,
         status: StatusCodes.BAD_REQUEST,
@@ -104,7 +104,7 @@ describe('react.client.ts', () => {
     })
 
     test('5xxの場合、失敗結果を返すこと', async () => {
-      const rss = react()
+      const rss = factory()
       const action = async (): Promise<Outcome<string>> => ({
         success: false,
         status: StatusCodes.INTERNAL_SERVER_ERROR,
@@ -119,7 +119,7 @@ describe('react.client.ts', () => {
     })
 
     test('エラーが発生した場合、失敗結果を返すこと', async () => {
-      const rss = react()
+      const rss = factory()
       const action = async () => {
         throw new Error('The get action was aborted')
       }
@@ -151,7 +151,7 @@ describe('react.client.ts', () => {
           },
         ),
       )
-      const rss = react()
+      const rss = factory()
 
       const { result } = renderHook(
         () =>
@@ -177,7 +177,7 @@ describe('react.client.ts', () => {
         title: 'Test Feed',
         entries,
       }
-      const rss = react()
+      const rss = factory()
       const action = async (): Promise<Outcome<typeof feed>> => ({
         success: true,
         status: StatusCodes.OK,
@@ -218,7 +218,7 @@ describe('react.client.ts', () => {
           ),
         ),
       )
-      const rss = react()
+      const rss = factory()
       const template = ({ page }: { page: number }) => `https://example.com/feed?page=${page}`
 
       const { result } = renderHook(
@@ -247,7 +247,7 @@ describe('react.client.ts', () => {
         description: 'Slice Feed Description',
         entries,
       }
-      const rss = react()
+      const rss = factory()
       const action = async (): Promise<Outcome<typeof feed>> => ({
         success: true,
         status: StatusCodes.OK,
@@ -281,7 +281,7 @@ describe('react.client.ts', () => {
         title: 'Last Page Feed',
         entries,
       }
-      const rss = react()
+      const rss = factory()
       const action = async (): Promise<Outcome<typeof feed>> => ({
         success: true,
         status: StatusCodes.OK,
@@ -316,7 +316,7 @@ describe('react.client.ts', () => {
         title: 'Default Feed',
         entries,
       }
-      const rss = react()
+      const rss = factory()
       const action = async (): Promise<Outcome<typeof defaults>> => ({
         success: true,
         status: StatusCodes.OK,
@@ -343,7 +343,7 @@ describe('react.client.ts', () => {
     })
 
     test('4xxの場合、失敗結果を返すこと', async () => {
-      const rss = react()
+      const rss = factory()
       const action = async (): Promise<Outcome<Feed>> => ({
         success: false,
         status: StatusCodes.BAD_REQUEST,
@@ -365,7 +365,7 @@ describe('react.client.ts', () => {
     })
 
     test('5xxの場合、失敗結果を返すこと', async () => {
-      const rss = react()
+      const rss = factory()
       const action = async (): Promise<Outcome<Feed>> => ({
         success: false,
         status: StatusCodes.INTERNAL_SERVER_ERROR,
@@ -387,7 +387,7 @@ describe('react.client.ts', () => {
     })
 
     test('エラーが発生した場合、失敗結果を返すこと', async () => {
-      const rss = react()
+      const rss = factory()
       const action = async () => {
         throw new Error('The infinite action was aborted')
       }
